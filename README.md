@@ -42,7 +42,7 @@ GitHub Actions builds macOS and Windows installers when a version tag such as `v
 
 ## KiroCrew external registry
 
-Add this public repository as an external registry using branch `release`, then sync apps. During local development, install the app manifest directly from the `app` directory.
+Add this public repository as an external registry using branch `main`, then sync apps. During local development, install the app manifest directly from the `app` directory.
 
 ## License
 
