@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "name": "kiro-desktop-pet",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "displayName": "Kiro Desktop Pet",
   "description": "A transparent image-only desktop pet that switches between two supplied character images.",
   "author": "Ethanvibe",
@@ -32,6 +32,20 @@
     "arch": [],
     "installMode": "client",
     "requiresDesktopApp": true
+  },
+  "ui": {
+    "pages": [
+      {
+        "route": "/kiro-desktop-pet",
+        "label": "桌宠",
+        "icon": "Ghost",
+        "entryPoint": "ui/index.mjs"
+      }
+    ],
+    "sidebar": {
+      "section": "Apps",
+      "order": 10
+    }
   },
   "permissions": {
     "api": [],

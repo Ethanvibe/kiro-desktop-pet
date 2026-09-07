@@ -37,7 +37,7 @@ npm install
 npm run tauri build
 ```
 
-GitHub Actions builds macOS and Windows installers when a version tag such as `v0.1.1` is pushed.
+GitHub Actions builds macOS and Windows installers when a version tag such as `v0.1.2` is pushed.
 
 ## KiroCrew external registry
 
