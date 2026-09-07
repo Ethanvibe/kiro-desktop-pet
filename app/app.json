@@ -1,17 +1,13 @@
 {
   "schemaVersion": 2,
   "name": "kiro-desktop-pet",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "Kiro Desktop Pet",
-  "description": "A cross-platform floating desktop companion with outfit switching and KiroCrew-aware interactions.",
+  "description": "A transparent image-only desktop pet that switches between two supplied character images.",
   "author": "Ethanvibe",
   "license": "MIT",
   "minCrewVersion": "0.3.0",
   "repo": "Ethanvibe/kiro-desktop-pet",
-  "iconPath": "assets/icon.png",
-  "screenshots": [
-    "assets/screenshot.png"
-  ],
   "tags": [
     "desktop-pet",
     "companion",
@@ -20,21 +16,22 @@
     "windows"
   ],
   "highlights": [
-    "Transparent always-on-top desktop companion",
-    "Business and casual outfit switching",
-    "Persistent skin preference",
-    "Drag-to-move and radial quick actions",
+    "Only the transparent character image floats on the desktop",
+    "Click the pet to switch between business and casual characters",
+    "Selected character persists across launches",
+    "Drag the character to move it anywhere",
     "Native installers for macOS and Windows"
   ],
-  "resources": "gateway",
-  "lifecycle": "gateway",
+  "resources": "app",
+  "lifecycle": "self",
   "platform": {
     "os": [
       "macos",
       "windows"
     ],
     "arch": [],
-    "installMode": "client"
+    "installMode": "client",
+    "requiresDesktopApp": true
   },
   "permissions": {
     "api": [],

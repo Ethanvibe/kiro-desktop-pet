@@ -1,15 +1,14 @@
 # Kiro Desktop Pet
 
-A lightweight floating desktop companion for KiroCrew, built with Tauri 2 and vanilla TypeScript. It supports macOS and Windows, transparent always-on-top windows, drag-to-move interaction, and persistent outfit switching.
+A lightweight image-only desktop companion for KiroCrew, built with Tauri 2 and vanilla TypeScript. It supports macOS and Windows, keeps only the supplied character artwork visible in a transparent always-on-top window, and remembers the selected character.
 
 ## MVP features
 
 - Transparent, borderless, always-on-top pet window
-- Drag the pet anywhere on the desktop
-- Click to open a radial action menu
-- Outfit-first interaction with business and casual skins
-- Selected outfit persists across launches
-- Task, rest, and hide quick actions
+- No card, status pill, menu, artificial backdrop, or window chrome
+- Drag the character anywhere on the desktop
+- Click the character to switch between the supplied business and casual images
+- Selected character persists across launches
 - Cross-platform GitHub Actions release builds
 - KiroCrew external registry metadata
 
@@ -22,7 +21,7 @@ A lightweight floating desktop companion for KiroCrew, built with Tauri 2 and va
 
 ## Development
 
-Requirements: Node.js 22+, Rust stable, and the platform prerequisites from the Tauri 2 documentation.
+Requirements: Node.js 22+, Rust 1.88+, and the platform prerequisites from the Tauri 2 documentation.
 
 ```bash
 cd app/desktop
@@ -38,7 +37,7 @@ npm install
 npm run tauri build
 ```
 
-GitHub Actions builds macOS and Windows installers when a version tag such as `v0.1.0` is pushed.
+GitHub Actions builds macOS and Windows installers when a version tag such as `v0.1.1` is pushed.
 
 ## KiroCrew external registry
 

@@ -3,6 +3,8 @@
     "name": "kiro-desktop-pet",
     "gitUrl": "https://github.com/Ethanvibe/kiro-desktop-pet",
     "branch": "main",
-    "subdirectory": "app"
+    "subdirectory": "app",
+    "resources": "app",
+    "lifecycle": "self"
   }
 ]
