@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "name": "kiro-desktop-pet",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "displayName": "Kiro Desktop Pet",
   "description": "A transparent image-only desktop pet that switches between two supplied character images.",
   "author": "Ethanvibe",
@@ -22,8 +22,8 @@
     "Drag the character to move it anywhere",
     "Native installers for macOS and Windows"
   ],
-  "resources": "app",
-  "lifecycle": "self",
+  "resources": "gateway",
+  "lifecycle": "gateway",
   "platform": {
     "os": [
       "macos",
@@ -47,10 +47,15 @@
       "order": 10
     }
   },
+  "backend": {
+    "routes": "backend.routes:register_routes"
+  },
   "permissions": {
-    "api": [],
+    "api": [
+      "/api/apps/kiro-desktop-pet/skin"
+    ],
     "events": [],
-    "storage": false,
+    "storage": true,
     "network": false
   }
 }
