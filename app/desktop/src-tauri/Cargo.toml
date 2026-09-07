@@ -1,0 +1,25 @@
+[package]
+name = "kiro-desktop-pet"
+version = "0.1.0"
+description = "A floating desktop companion for KiroCrew"
+authors = ["Ethanvibe"]
+license = "MIT"
+edition = "2021"
+rust-version = "1.85"
+
+[lib]
+name = "kiro_desktop_pet_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "=2.6.3", features = [] }
+
+[dependencies]
+tauri = { version = "=2.11.5", features = ["image-png"] }
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true
