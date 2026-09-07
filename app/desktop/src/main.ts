@@ -1,3 +1,4 @@
+import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import "./styles.css";
 
@@ -44,11 +45,28 @@ let activeSkin: SkinId =
 let pointerOrigin: { x: number; y: number } | null = null;
 let dragging = false;
 
-function updateSkin(skinId: SkinId) {
+function updateSkin(skinId: SkinId, persistShared = true) {
   activeSkin = skinId;
   petImage.src = skins[skinId].src;
   petImage.alt = `穿着${skins[skinId].label}的 Kiro 桌面宠物`;
   localStorage.setItem("kiro-pet-skin", skinId);
+  if (persistShared) {
+    void invoke("set_skin", { skin: skinId }).catch(console.error);
+  }
+}
+
+async function syncSharedSkin() {
+  try {
+    const sharedSkin = await invoke<string>("get_skin");
+    if (
+      (sharedSkin === "business" || sharedSkin === "casual") &&
+      sharedSkin !== activeSkin
+    ) {
+      updateSkin(sharedSkin, false);
+    }
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function switchSkin() {
@@ -88,4 +106,6 @@ petSurface.addEventListener("pointercancel", () => {
 
 document.addEventListener("contextmenu", (event) => event.preventDefault());
 
-updateSkin(activeSkin);
+updateSkin(activeSkin, false);
+void syncSharedSkin();
+window.setInterval(() => void syncSharedSkin(), 1000);

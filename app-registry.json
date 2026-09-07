@@ -4,7 +4,7 @@
     "gitUrl": "https://github.com/Ethanvibe/kiro-desktop-pet",
     "branch": "main",
     "subdirectory": "app",
-    "resources": "app",
-    "lifecycle": "self"
+    "resources": "gateway",
+    "lifecycle": "gateway"
   }
 ]
