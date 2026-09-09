@@ -1,5 +1,7 @@
 # Kiro Desktop Pet App Package
 
-This directory is the complete KiroCrew App referenced by the repository's external registry. Users add the public GitHub repository on branch `main`, sync Apps, trust only this repository-bound App, install it, and open **桌宠** from the sidebar.
+This directory is the complete KiroCrew App referenced by the repository's external registry. Users add the public GitHub repository on branch `main`, sync Apps, trust this repository-bound App, install it, and enable it.
 
-The App runs entirely inside KiroCrew. It has no native desktop client, installer, backend route, network access, or external runtime. The page loads the two bundled transparent PNG files, shows one small character without a card or artificial background, switches skin when the character is clicked, and lets the user drag it within the page. Skin and position are remembered in the page's local browser storage.
+On macOS, KiroCrew runs the lifecycle hook in `backend/hooks.py`. The hook starts the bundled `native/macos/overlay.js` through the system `osascript` runtime and closes it when the App is disabled or KiroCrew exits. The helper creates a transparent, borderless, always-on-top Cocoa panel; clicking the character switches skin and dragging moves it anywhere on the desktop. Skin and screen position are stored under the App's own data directory.
+
+The App requires KiroCrew Desktop and macOS. It downloads no dependency, opens no network connection, and installs no separate application.

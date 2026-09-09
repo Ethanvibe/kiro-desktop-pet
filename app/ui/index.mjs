@@ -83,8 +83,8 @@ export function mount(target) {
         position: absolute;
         z-index: 1;
         display: block;
-        width: clamp(132px, 19vw, 210px);
-        height: clamp(220px, 44vh, 330px);
+        width: clamp(100px, 14vw, 150px);
+        height: clamp(168px, 32vh, 235px);
         padding: 0;
         appearance: none;
         color: inherit;
@@ -125,8 +125,8 @@ export function mount(target) {
       }
       @media (max-width: 640px) {
         .kiro-pet-surface {
-          width: clamp(120px, 38vw, 175px);
-          height: clamp(200px, 42vh, 285px);
+          width: clamp(96px, 28vw, 135px);
+          height: clamp(160px, 31vh, 220px);
         }
       }
     </style>

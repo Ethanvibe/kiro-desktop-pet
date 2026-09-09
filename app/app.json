@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
   "name": "kiro-desktop-pet",
-  "version": "0.1.7",
+  "version": "0.2.1",
   "displayName": "Kiro Desktop Pet",
-  "description": "A small transparent image-only pet that lives inside KiroCrew.",
+  "description": "A transparent always-on-top desktop pet launched and managed by KiroCrew on macOS.",
   "author": "Ethanvibe",
   "license": "MIT",
   "minCrewVersion": "0.3.0",
@@ -14,14 +14,27 @@
     "kirocrew"
   ],
   "highlights": [
-    "Runs entirely inside KiroCrew with no separate desktop app",
+    "Floats anywhere on the macOS desktop in a transparent always-on-top window",
     "Uses the two bundled transparent character images",
     "Click the pet to switch between business and casual skins",
-    "Drag the pet anywhere within its KiroCrew page",
-    "Remembers the selected skin and position"
+    "Drag the pet across the desktop and Spaces",
+    "Remembers the selected skin and screen position",
+    "Starts and stops automatically with the KiroCrew App"
   ],
   "resources": "gateway",
   "lifecycle": "gateway",
+  "platform": {
+    "os": [
+      "macos"
+    ],
+    "requiresDesktopApp": true
+  },
+  "backend": {
+    "hooks": {
+      "on_startup": "backend.hooks:on_startup",
+      "on_shutdown": "backend.hooks:on_shutdown"
+    }
+  },
   "ui": {
     "entry": "index.mjs",
     "pages": [
@@ -39,7 +52,7 @@
   "permissions": {
     "api": [],
     "events": [],
-    "storage": false,
+    "storage": true,
     "network": false
   }
 }
