@@ -238,7 +238,6 @@ export function mount(target) {
   };
 }
 
-export default mount;
 
 export default function KiroDesktopPetPage() {
   const rootRef = useRef(null);

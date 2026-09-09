@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "name": "kiro-desktop-pet",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "displayName": "Kiro Desktop Pet",
   "description": "A small transparent image-only pet that lives inside KiroCrew.",
   "author": "Ethanvibe",
