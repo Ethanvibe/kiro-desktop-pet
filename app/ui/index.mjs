@@ -1,11 +1,12 @@
-const RELEASE_URL = "https://github.com/Ethanvibe/kiro-desktop-pet/releases/tag/v0.1.3";
-const MAC_DOWNLOAD =
-  "https://github.com/Ethanvibe/kiro-desktop-pet/releases/download/v0.1.3/Kiro.Desktop.Pet_0.1.3_aarch64.dmg";
-const WINDOWS_DOWNLOAD =
-  "https://github.com/Ethanvibe/kiro-desktop-pet/releases/download/v0.1.3/Kiro.Desktop.Pet_0.1.3_x64-setup.exe";
 const BUSINESS_IMAGE = new URL("./assets/business.png", import.meta.url).href;
 const CASUAL_IMAGE = new URL("./assets/casual.png", import.meta.url).href;
-const SKIN_ENDPOINT = "/api/apps/kiro-desktop-pet/skin";
+const SKIN_KEY = "kiro-desktop-pet:skin";
+const POSITION_KEY = "kiro-desktop-pet:position";
+
+const skins = {
+  business: { label: "商务装", src: BUSINESS_IMAGE },
+  casual: { label: "休闲装", src: CASUAL_IMAGE },
+};
 
 function resolveRoot(target) {
   if (target instanceof HTMLElement) return target;
@@ -22,21 +23,20 @@ function resolveRoot(target) {
   throw new Error("Kiro Desktop Pet UI mount target is unavailable");
 }
 
-async function loadSkin() {
-  const response = await fetch(SKIN_ENDPOINT, { credentials: "same-origin" });
-  if (!response.ok) throw new Error(`Skin request failed: ${response.status}`);
-  const payload = await response.json();
-  return payload.skin === "casual" ? "casual" : "business";
+function clamp(value, minimum, maximum) {
+  return Math.min(maximum, Math.max(minimum, value));
 }
 
-async function saveSkin(skin) {
-  const response = await fetch(SKIN_ENDPOINT, {
-    method: "PUT",
-    credentials: "same-origin",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ skin }),
-  });
-  if (!response.ok) throw new Error(`Skin update failed: ${response.status}`);
+function loadPosition() {
+  try {
+    const value = JSON.parse(localStorage.getItem(POSITION_KEY) || "null");
+    if (Number.isFinite(value?.x) && Number.isFinite(value?.y)) {
+      return { x: clamp(value.x, 0, 1), y: clamp(value.y, 0, 1) };
+    }
+  } catch {
+    // Ignore invalid values left by an older version.
+  }
+  return { x: 0.5, y: 0.56 };
 }
 
 export function mount(target) {
@@ -46,158 +46,192 @@ export function mount(target) {
   page.innerHTML = `
     <style>
       .kiro-pet-page {
-        min-height: 100%;
-        padding: clamp(24px, 5vw, 56px);
-        color: var(--text, #e8ebf2);
-        background: var(--bg, #0d0f12);
-        font-family: Inter, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
-      }
-      .kiro-pet-shell { max-width: 960px; margin: 0 auto; }
-      .kiro-pet-eyebrow {
-        margin: 0 0 10px;
-        color: #8ba8ff;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: .14em;
-        text-transform: uppercase;
-      }
-      .kiro-pet-page h1 { margin: 0; font-size: clamp(30px, 5vw, 46px); line-height: 1.08; }
-      .kiro-pet-lead { max-width: 720px; margin: 14px 0 26px; color: #aeb6c7; line-height: 1.7; }
-      .kiro-pet-status {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin: 0 0 22px;
-        padding: 13px 16px;
-        background: #151922;
-        border: 1px solid #2a3040;
-        border-radius: 14px;
-      }
-      .kiro-pet-dot { width: 10px; height: 10px; background: #45c58a; border-radius: 50%; box-shadow: 0 0 0 5px rgb(69 197 138 / 14%); }
-      .kiro-pet-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-      .kiro-pet-choice {
         position: relative;
-        display: grid;
-        min-height: 460px;
-        padding: 18px;
-        color: inherit;
-        text-align: center;
-        background: #151922;
-        border: 2px solid #2a3040;
-        border-radius: 22px;
-        cursor: pointer;
-        transition: 160ms ease;
+        width: 100%;
+        min-height: 100%;
+        overflow: hidden;
+        color: var(--text, inherit);
+        background: transparent;
+        font-family: Inter, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+        user-select: none;
+        -webkit-user-select: none;
       }
-      .kiro-pet-choice:hover { border-color: #53617a; transform: translateY(-2px); }
-      .kiro-pet-choice.selected { border-color: #6f91ff; background: #182039; box-shadow: 0 0 0 3px rgb(111 145 255 / 12%); }
-      .kiro-pet-choice img { width: 100%; height: 360px; object-fit: contain; pointer-events: none; }
-      .kiro-pet-choice strong { margin-top: 10px; font-size: 18px; }
-      .kiro-pet-choice span { margin-top: 4px; color: #9da7ba; font-size: 13px; }
-      .kiro-pet-check {
+      .kiro-pet-canvas {
+        position: relative;
+        width: 100%;
+        min-height: clamp(440px, calc(100vh - 150px), 760px);
+        overflow: hidden;
+        background: transparent;
+      }
+      .kiro-pet-hint {
         position: absolute;
-        top: 16px;
-        right: 16px;
-        display: none;
-        padding: 6px 10px;
-        color: white !important;
-        font-size: 12px !important;
-        font-weight: 700;
-        background: #5279ed;
-        border-radius: 999px;
+        top: 12px;
+        left: 50%;
+        z-index: 2;
+        margin: 0;
+        color: var(--text-muted, var(--muted-foreground, #8d96a8));
+        font-size: 12px;
+        line-height: 1.4;
+        white-space: nowrap;
+        opacity: .78;
+        pointer-events: none;
+        transform: translateX(-50%);
       }
-      .kiro-pet-choice.selected .kiro-pet-check { display: block; }
-      .kiro-pet-downloads { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
-      .kiro-pet-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 42px;
-        padding: 0 16px;
-        color: white;
-        font-weight: 700;
-        text-decoration: none;
-        background: #4169e1;
-        border-radius: 11px;
+      .kiro-pet-surface {
+        position: absolute;
+        z-index: 1;
+        display: block;
+        width: clamp(132px, 19vw, 210px);
+        height: clamp(220px, 44vh, 330px);
+        padding: 0;
+        appearance: none;
+        color: inherit;
+        background: transparent;
+        border: 0;
+        outline: 0;
+        box-shadow: none;
+        cursor: grab;
+        touch-action: none;
+        transform: translate(-50%, -50%);
+        -webkit-tap-highlight-color: transparent;
       }
-      .kiro-pet-button.secondary { color: #c9d1df; background: #202633; border: 1px solid #353d4d; }
-      .kiro-pet-button:hover { filter: brightness(1.1); }
-      .kiro-pet-help { margin: 14px 0 0; color: #8992a5; font-size: 13px; line-height: 1.6; }
-      .kiro-pet-help a { color: #8ba8ff; }
-      @media (max-width: 700px) {
-        .kiro-pet-picker { grid-template-columns: 1fr; }
-        .kiro-pet-choice { min-height: 400px; }
-        .kiro-pet-choice img { height: 300px; }
+      .kiro-pet-surface:active { cursor: grabbing; }
+      .kiro-pet-surface:focus-visible {
+        outline: 2px solid var(--accent, #6f91ff);
+        outline-offset: 5px;
+        border-radius: 45%;
+      }
+      .kiro-pet-image {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center bottom;
+        pointer-events: none;
+        -webkit-user-drag: none;
+      }
+      .kiro-pet-sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      @media (max-width: 640px) {
+        .kiro-pet-surface {
+          width: clamp(120px, 38vw, 175px);
+          height: clamp(200px, 42vh, 285px);
+        }
       }
     </style>
-    <main class="kiro-pet-shell">
-      <p class="kiro-pet-eyebrow">KiroCrew Desktop App</p>
-      <h1>选择桌宠</h1>
-      <p class="kiro-pet-lead">
-        选择会立即保存。已运行的桌宠会自动切换；下次打开桌宠时也会继续使用这里选中的人物。
-      </p>
-      <div class="kiro-pet-status" role="status">
-        <span class="kiro-pet-dot" aria-hidden="true"></span>
-        <strong id="kiroPetStatus">正在读取当前桌宠…</strong>
-      </div>
-      <section class="kiro-pet-picker" aria-label="桌宠图片选择">
-        <button class="kiro-pet-choice" type="button" data-skin="business" aria-pressed="false">
-          <span class="kiro-pet-check">当前使用</span>
-          <img src="${BUSINESS_IMAGE}" alt="商务装桌宠" />
-          <strong>商务装</strong>
-          <span>深蓝西装</span>
-        </button>
-        <button class="kiro-pet-choice" type="button" data-skin="casual" aria-pressed="false">
-          <span class="kiro-pet-check">当前使用</span>
-          <img src="${CASUAL_IMAGE}" alt="休闲装桌宠" />
-          <strong>休闲装</strong>
-          <span>绿色夹克</span>
-        </button>
-      </section>
-      <div class="kiro-pet-downloads">
-        <a class="kiro-pet-button" href="${MAC_DOWNLOAD}" target="_blank" rel="noreferrer">下载 macOS 版</a>
-        <a class="kiro-pet-button" href="${WINDOWS_DOWNLOAD}" target="_blank" rel="noreferrer">下载 Windows 版</a>
-        <a class="kiro-pet-button secondary" href="${RELEASE_URL}" target="_blank" rel="noreferrer">查看 Release</a>
-      </div>
-      <p class="kiro-pet-help">原生桌宠窗口仍然只有透明人物图片，不显示卡片、状态栏或人工背景。</p>
+    <main class="kiro-pet-canvas" aria-label="Kiro 桌宠活动区域">
+      <p class="kiro-pet-hint">点击人物换装 · 拖动人物移动</p>
+      <button class="kiro-pet-surface" type="button">
+        <img class="kiro-pet-image" draggable="false" />
+        <span class="kiro-pet-sr-only" aria-live="polite"></span>
+      </button>
     </main>
   `;
 
   root.replaceChildren(page);
 
-  const status = page.querySelector("#kiroPetStatus");
-  const choices = [...page.querySelectorAll("[data-skin]")];
+  const canvas = page.querySelector(".kiro-pet-canvas");
+  const surface = page.querySelector(".kiro-pet-surface");
+  const image = page.querySelector(".kiro-pet-image");
+  const announcement = page.querySelector(".kiro-pet-sr-only");
+  let activeSkin = localStorage.getItem(SKIN_KEY) === "casual" ? "casual" : "business";
+  let position = loadPosition();
+  let drag = null;
 
-  const renderSelection = (skin) => {
-    for (const choice of choices) {
-      const selected = choice.dataset.skin === skin;
-      choice.classList.toggle("selected", selected);
-      choice.setAttribute("aria-pressed", String(selected));
-    }
-    status.textContent = skin === "casual" ? "当前桌宠：休闲装" : "当前桌宠：商务装";
+  const renderPosition = () => {
+    const canvasRect = canvas.getBoundingClientRect();
+    const surfaceRect = surface.getBoundingClientRect();
+    const minX = canvasRect.width ? surfaceRect.width / 2 / canvasRect.width : 0;
+    const minY = canvasRect.height ? surfaceRect.height / 2 / canvasRect.height : 0;
+    position = {
+      x: clamp(position.x, minX, 1 - minX),
+      y: clamp(position.y, minY, 1 - minY),
+    };
+    surface.style.left = `${position.x * 100}%`;
+    surface.style.top = `${position.y * 100}%`;
   };
 
-  for (const choice of choices) {
-    choice.addEventListener("click", async () => {
-      const skin = choice.dataset.skin;
-      status.textContent = "正在保存…";
-      try {
-        await saveSkin(skin);
-        renderSelection(skin);
-      } catch (error) {
-        console.error(error);
-        status.textContent = "保存失败，请确认 App 已启用并受信任";
-      }
-    });
-  }
+  const renderSkin = (announce = false) => {
+    const skin = skins[activeSkin];
+    image.src = skin.src;
+    image.alt = `${skin.label} Kiro 桌宠`;
+    surface.setAttribute("aria-label", `当前${skin.label}。点击换装，拖动移动`);
+    if (announce) announcement.textContent = `已切换为${skin.label}`;
+  };
 
-  loadSkin()
-    .then(renderSelection)
-    .catch((error) => {
-      console.error(error);
-      status.textContent = "无法读取桌宠设置，请确认 App 已启用并受信任";
-    });
+  const switchSkin = () => {
+    activeSkin = activeSkin === "business" ? "casual" : "business";
+    localStorage.setItem(SKIN_KEY, activeSkin);
+    renderSkin(true);
+  };
+
+  const persistPosition = () => {
+    localStorage.setItem(POSITION_KEY, JSON.stringify(position));
+  };
+
+  surface.addEventListener("pointerdown", (event) => {
+    drag = {
+      pointerId: event.pointerId,
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      startX: position.x,
+      startY: position.y,
+      moved: false,
+    };
+    surface.setPointerCapture(event.pointerId);
+  });
+
+  surface.addEventListener("pointermove", (event) => {
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
+    const deltaX = event.clientX - drag.startClientX;
+    const deltaY = event.clientY - drag.startClientY;
+    if (Math.hypot(deltaX, deltaY) > 5) drag.moved = true;
+
+    position = {
+      x: drag.startX + deltaX / rect.width,
+      y: drag.startY + deltaY / rect.height,
+    };
+    renderPosition();
+  });
+
+  surface.addEventListener("pointerup", (event) => {
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    if (drag.moved) persistPosition();
+    else switchSkin();
+    drag = null;
+  });
+
+  surface.addEventListener("pointercancel", () => {
+    if (drag?.moved) persistPosition();
+    drag = null;
+  });
+
+  surface.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      switchSkin();
+    }
+  });
+
+  const handleResize = () => renderPosition();
+  window.addEventListener("resize", handleResize);
+  renderSkin();
+  requestAnimationFrame(renderPosition);
 
   return () => {
+    window.removeEventListener("resize", handleResize);
     if (page.parentNode === root) page.remove();
   };
 }

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
   "name": "kiro-desktop-pet",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "displayName": "Kiro Desktop Pet",
-  "description": "A transparent image-only desktop pet that switches between two supplied character images.",
+  "description": "A small transparent image-only pet that lives inside KiroCrew.",
   "author": "Ethanvibe",
   "license": "MIT",
   "minCrewVersion": "0.3.0",
@@ -11,28 +11,17 @@
   "tags": [
     "desktop-pet",
     "companion",
-    "productivity",
-    "macos",
-    "windows"
+    "kirocrew"
   ],
   "highlights": [
-    "Only the transparent character image floats on the desktop",
-    "Click the pet to switch between business and casual characters",
-    "Selected character persists across launches",
-    "Drag the character to move it anywhere",
-    "Native installers for macOS and Windows"
+    "Runs entirely inside KiroCrew with no separate desktop app",
+    "Uses the two bundled transparent character images",
+    "Click the pet to switch between business and casual skins",
+    "Drag the pet anywhere within its KiroCrew page",
+    "Remembers the selected skin and position"
   ],
   "resources": "gateway",
   "lifecycle": "gateway",
-  "platform": {
-    "os": [
-      "macos",
-      "windows"
-    ],
-    "arch": [],
-    "installMode": "client",
-    "requiresDesktopApp": true
-  },
   "ui": {
     "pages": [
       {
@@ -47,15 +36,10 @@
       "order": 10
     }
   },
-  "backend": {
-    "routes": "backend.routes:register_routes"
-  },
   "permissions": {
-    "api": [
-      "/api/apps/kiro-desktop-pet/skin"
-    ],
+    "api": [],
     "events": [],
-    "storage": true,
+    "storage": false,
     "network": false
   }
 }

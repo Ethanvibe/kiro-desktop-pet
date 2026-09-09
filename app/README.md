@@ -1,14 +1,5 @@
 # Kiro Desktop Pet App Package
 
-This directory is the KiroCrew-installable metadata package referenced by the repository's external registry. The native desktop client lives in `desktop/` and is distributed separately as macOS and Windows installers from GitHub Releases.
+This directory is the complete KiroCrew App referenced by the repository's external registry. Users add the public GitHub repository on branch `main`, sync Apps, trust only this repository-bound App, install it, and open **桌宠** from the sidebar.
 
-The App package is gateway-managed so KiroCrew copies its visual UI, the two transparent character images, and the minimal skin-setting route. Add the repository as an external registry on branch `main`, sync it, explicitly trust this third-party App, and install **Kiro Desktop Pet**. After enabling it, the **桌宠** entry with a Ghost icon appears in the Apps section of the KiroCrew sidebar. Choose either character there; the selection is persisted in the App data directory and is picked up automatically by the native transparent pet window.
-
-For local manifest validation:
-
-```bash
-kirocrew app install /absolute/path/to/kiro-desktop-pet/app
-kirocrew app enable kiro-desktop-pet
-```
-
-The desktop window itself contains only the transparent character image. Drag to move it; click it to switch between the supplied business and casual characters.
+The App runs entirely inside KiroCrew. It has no native desktop client, installer, backend route, network access, or external runtime. The page loads the two bundled transparent PNG files, shows one small character without a card or artificial background, switches skin when the character is clicked, and lets the user drag it within the page. Skin and position are remembered in the page's local browser storage.
