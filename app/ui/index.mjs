@@ -1,3 +1,5 @@
+import { createElement, useEffect, useRef } from "react";
+
 const BUSINESS_IMAGE = new URL("./assets/business.png", import.meta.url).href;
 const CASUAL_IMAGE = new URL("./assets/casual.png", import.meta.url).href;
 const SKIN_KEY = "kiro-desktop-pet:skin";
@@ -237,3 +239,22 @@ export function mount(target) {
 }
 
 export default mount;
+
+export default function KiroDesktopPetPage() {
+  const rootRef = useRef(null);
+
+  useEffect(() => {
+    if (!rootRef.current) return undefined;
+    return mount(rootRef.current);
+  }, []);
+
+  return createElement("div", {
+    ref: rootRef,
+    style: {
+      width: "100%",
+      height: "100%",
+      minHeight: 0,
+      overflow: "hidden",
+    },
+  });
+}

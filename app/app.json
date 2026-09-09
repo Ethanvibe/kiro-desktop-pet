@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "name": "kiro-desktop-pet",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "displayName": "Kiro Desktop Pet",
   "description": "A small transparent image-only pet that lives inside KiroCrew.",
   "author": "Ethanvibe",
@@ -23,12 +23,12 @@
   "resources": "gateway",
   "lifecycle": "gateway",
   "ui": {
+    "entry": "ui/index.mjs",
     "pages": [
       {
-        "route": "/kiro-desktop-pet",
+        "route": "/apps/kiro-desktop-pet",
         "label": "桌宠",
-        "icon": "Ghost",
-        "entryPoint": "ui/index.mjs"
+        "icon": "Ghost"
       }
     ],
     "sidebar": {
